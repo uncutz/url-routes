@@ -1,0 +1,36 @@
+services:
+  php:
+    build:
+      context: ./php
+    volumes:
+        - ./:/public
+  nginx:
+      image: nginx
+      ports:
+        - 8082:80
+      volumes:
+        - ./:/public
+        - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      depends_on:
+        - php
+
+  mysql:
+      platform: linux/x86_64
+      image: mysql
+      command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+      volumes:
+        - ./mysql:/var/lib/mysql
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+      ports:
+        - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8083:80
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+
